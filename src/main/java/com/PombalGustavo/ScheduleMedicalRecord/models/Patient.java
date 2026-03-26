@@ -22,19 +22,24 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long patientId;
 
-    @Column(nullable = false)
+    @Column(name = "patient_name", nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "patient_cpf", nullable = false, unique = true)
     private String cpf;
 
-    @Column(nullable = false)
+    @Column(name = "patient_birthdate", nullable = false)
     private Date birthdate;
 
-    @Column(nullable = false)
+    @Column(name = "patient_phone", nullable = false)
     private String phone;
 
     @CreationTimestamp
+    @Column(name = "patient_creation_timestamp", nullable = false)
     private Instant creationTimestamp;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "clinic_id", nullable = false)
+    private Clinic clinic;
 
 }
