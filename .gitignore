@@ -1,4 +1,6 @@
 application-dev.properties
+app.key
+app.pub
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar

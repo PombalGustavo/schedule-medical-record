@@ -1,8 +1,13 @@
 package com.PombalGustavo.ScheduleMedicalRecord.models;
 
+import com.PombalGustavo.ScheduleMedicalRecord.dto.login.LoginRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,7 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "patientId")
+@EqualsAndHashCode(of = "user_id")
 public class User {
 
     @Id
@@ -21,15 +26,16 @@ public class User {
     private UUID userId;
 
     @Column(nullable = false)
-    private String name;
+    private String username;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
 
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clinic_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Clinic clinic;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -38,5 +44,9 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
+
+    public Boolean isLoginCorrect(LoginRequestDTO loginRequestDTO, PasswordEncoder passwordEncoder) {
+       return passwordEncoder.matches(loginRequestDTO.password(), this.password);
+    }
 }
