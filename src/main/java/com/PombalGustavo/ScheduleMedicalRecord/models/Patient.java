@@ -25,8 +25,8 @@ import java.util.UUID;
 public class Patient {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long patientId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID patientId;
 
     @Column(name = "patient_name", nullable = false)
     private String name;

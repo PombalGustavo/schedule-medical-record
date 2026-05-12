@@ -19,12 +19,12 @@ public class ExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
+     /*@org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralError(Exception ex) {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Ocorreu um erro interno no servidor."
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
+    }  */
 }

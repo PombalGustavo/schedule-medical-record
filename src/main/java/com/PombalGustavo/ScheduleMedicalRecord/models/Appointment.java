@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tb_appointments")
@@ -17,13 +18,13 @@ import java.time.Instant;
 public class Appointment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long appointmentId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID appointmentId;
 
     @Column(name = "date_and_time", nullable = false)
     private Instant dateAndTime;
 
-    @Column(name = "description", nullable = false, length = 50)
+    @Column(name = "description", nullable = false, length = 255)
     private String description;
 
     @Enumerated(EnumType.STRING)

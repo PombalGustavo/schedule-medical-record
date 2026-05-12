@@ -1,6 +1,6 @@
 package com.PombalGustavo.ScheduleMedicalRecord.models;
 
-import com.PombalGustavo.ScheduleMedicalRecord.infra.encryption.EncryptionConverter;
+import com.PombalGustavo.ScheduleMedicalRecord.infra.Crypto.CryptoService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,11 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tb_medicalRecord")
@@ -24,12 +24,11 @@ import java.time.LocalDateTime;
 public class MedicalRecord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long medicalRecordId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID medicalRecordId;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    @Convert(converter = EncryptionConverter.class)
-    private String contentText;
+    private String encryptedContentText;
 
     @CreatedDate
     @Column(name = "medical_record_created_at",nullable = false, updatable = false)
@@ -55,5 +54,18 @@ public class MedicalRecord {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Transient
+    private String rawContentText;
+
+    @PrePersist
+    public void prePersist() {
+        this.encryptedContentText = CryptoService.encrypt(rawContentText);
+    }
+
+    @PostLoad
+    public void postLoad() {
+        this.rawContentText = CryptoService.decrypt(encryptedContentText);
+    }
 
 }

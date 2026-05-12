@@ -6,10 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface PatientRepository extends JpaRepository<Patient, Long> {
+public interface PatientRepository extends JpaRepository<Patient, UUID> {
 
-    List<Patient> findAllByClinicId(Long clinicId);
+    List<Patient> findAllByClinicId(UUID clinicId);
 }
 

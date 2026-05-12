@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
@@ -30,7 +31,7 @@ public class PatientController {
     @PostMapping
     public ResponseEntity<PatientResponseDTO> savePatient(@Valid @RequestBody PatientRequestDTO dto,
                                                           @AuthenticationPrincipal Jwt jwt) {
-        Long clinicId = jwt.getClaim("clinicId");
+        UUID clinicId = UUID.fromString(jwt.getClaim("clinicId"));
 
         Clinic clinic = clinicRepository.findById(clinicId)
                 .orElseThrow(() -> new EntityNotFoundException("Clinic not found"));
@@ -48,7 +49,7 @@ public class PatientController {
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable Long id,
+    public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id,
                                                             @Valid @RequestBody PatientRequestDTO dto,
                                                             @AuthenticationPrincipal Jwt jwt) {
         Patient patient = patientRepository.findById(id)
@@ -66,10 +67,10 @@ public class PatientController {
 
     @Transactional
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePatient(@PathVariable Long id) {
-        if (!patientRepository.existsById(id)) {
-            throw new EntityNotFoundException("Patient not found with ID: " + id);
-        }
+    public ResponseEntity<String> deletePatient(@PathVariable UUID id) {
+
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
 
         patientRepository.deleteById(id);
 
@@ -79,7 +80,8 @@ public class PatientController {
     @Transactional(readOnly = true)
     @GetMapping
     public ResponseEntity<List<PatientResponseDTO>> getAllPatients(@AuthenticationPrincipal Jwt jwt) {
-        Long clinicId = jwt.getClaim("clinicId");
+
+        UUID clinicId = UUID.fromString(jwt.getClaim("clinicId"));
 
         List<PatientResponseDTO> dtos = patientRepository.findAllByClinicId(clinicId)
                 .stream()

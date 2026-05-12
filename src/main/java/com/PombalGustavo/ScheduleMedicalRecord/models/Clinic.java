@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tb_clinic")
@@ -18,9 +19,9 @@ import java.time.Instant;
 public class Clinic {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "clinic_id", nullable = false)
-    private Long id;
+    private UUID id;
 
     @Column( name = "clinic_name")
     private String clinicName;

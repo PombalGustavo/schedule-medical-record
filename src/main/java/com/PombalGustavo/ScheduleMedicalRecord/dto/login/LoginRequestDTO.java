@@ -1,4 +1,6 @@
 package com.PombalGustavo.ScheduleMedicalRecord.dto.login;
 
-public record LoginRequestDTO(String email, String password) {
-}
+public record LoginRequestDTO(
+        String email,
+        String password
+) {}

@@ -3,6 +3,7 @@ package com.PombalGustavo.ScheduleMedicalRecord.controllers;
 import com.PombalGustavo.ScheduleMedicalRecord.dto.login.LoginRequestDTO;
 import com.PombalGustavo.ScheduleMedicalRecord.dto.login.LoginResponseDTO;
 import com.PombalGustavo.ScheduleMedicalRecord.repositorys.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,17 +19,12 @@ import java.time.Instant;
 
 @RestController
 @RequestMapping("/user")
+@AllArgsConstructor
 public class UserController {
 
     private final JwtEncoder jwtEncoder;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    public UserController(JwtEncoder jwtEncoder , UserRepository userRepository,  BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.jwtEncoder = jwtEncoder;
-        this.userRepository = userRepository;
-        this.passwordEncoder = bCryptPasswordEncoder;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
@@ -39,7 +35,7 @@ public class UserController {
         }
 
         var now = Instant.now();
-        var expiresIn = 900L;
+        var expiresIn = 10800L;
 
         var claims = JwtClaimsSet.builder()
                 .issuer("mybackend")
