@@ -32,7 +32,7 @@ public class MedicalRecord {
 
     @CreatedDate
     @Column(name = "medical_record_created_at",nullable = false, updatable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "medical_record_updated_at", nullable = false)

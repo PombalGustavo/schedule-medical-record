@@ -31,7 +31,7 @@ public class ClinicController {
 
 
     @Transactional
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<ClinicAndUserResponseDTO> createClinicWithAdmin(@RequestBody ClinicRegisterDTO dto){
 
         Clinic clinic = new Clinic();

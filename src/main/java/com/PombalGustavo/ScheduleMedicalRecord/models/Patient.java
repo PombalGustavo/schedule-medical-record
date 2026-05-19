@@ -9,6 +9,7 @@ import org.hibernate.annotations.processing.Pattern;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,12 +32,12 @@ public class Patient {
     @Column(name = "patient_name", nullable = false)
     private String name;
 
-    @Column(name = "patient_cpf", nullable = false, unique = true)
+    @Column(name = "patient_cpf", nullable = false)
     @CPF
     private String cpf;
 
     @Column(name = "patient_birthdate", nullable = false)
-    private Date birthdate;
+    private LocalDate birthdate;
 
     @Column(name = "patient_phone", nullable = false)
     private String phone;

@@ -4,6 +4,7 @@ import com.PombalGustavo.ScheduleMedicalRecord.models.Clinic;
 import com.PombalGustavo.ScheduleMedicalRecord.models.Patient;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public record PatientResponseDTO(
         UUID patientId,
         String name,
         String cpf,
-        Date birthdate,
+        LocalDate birthdate,
         String phone,
         Instant creationTimestamp,
         UUID clinicId,

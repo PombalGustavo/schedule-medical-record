@@ -12,5 +12,8 @@ import java.util.UUID;
 public interface PatientRepository extends JpaRepository<Patient, UUID> {
 
     List<Patient> findAllByClinicId(UUID clinicId);
+    boolean existsByCpfAndClinicId(String cpf, UUID clinicId);
+    List<Patient> findByNameContainingIgnoreCaseAndClinicId(String name, UUID clinicId);
+    Patient findByCpfAndClinicId(String cpf, UUID clinicId);
 }
 

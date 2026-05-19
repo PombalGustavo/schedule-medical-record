@@ -12,13 +12,16 @@ import com.PombalGustavo.ScheduleMedicalRecord.repositorys.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,10 +38,24 @@ public class AppointmentController {
     @Transactional
     @PostMapping
     public ResponseEntity<AppointmentResponseDTO> addAppointment(@Valid @RequestBody AppointmentRequestDTO dto,
-                                                                 @AuthenticationPrincipal Jwt jwt) {
+                                                                 @AuthenticationPrincipal Jwt jwt) throws BadRequestException {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime appointmentStartDateTime = LocalDateTime.of(dto.date(), dto.startTime());
+
+        if (appointmentStartDateTime.isBefore(now)) {
+            throw new BadRequestException("O agendamento não pode ser criado em uma data/hora que já passou.");
+        }
+
+        if (dto.startTime().isAfter(dto.endTime()) || dto.startTime().equals(dto.endTime())) {
+            throw new BadRequestException("O horário de início deve ser menor que o horário de término.");
+        }
+
 
         Appointment appointment = new Appointment();
-        appointment.setDateAndTime(dto.dateAndTime());
+        appointment.setDate(dto.date());
+        appointment.setStartTime(dto.startTime());
+        appointment.setEndTime(dto.endTime());
         appointment.setDescription(dto.description());
         appointment.setStatus(dto.status());
         appointment.setPatient(patientRepository.findById(dto.patientId())
@@ -74,23 +91,64 @@ public class AppointmentController {
                 .map(AppointmentResponseDTO::new)
                 .toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(dtos);
+        if (dtos.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok(dtos);
     }
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<AppointmentResponseDTO> updateAppointment(@PathVariable UUID id, @Valid @RequestBody AppointmentRequestDTO dto) {
+    public ResponseEntity<AppointmentResponseDTO> updateAppointment(@PathVariable UUID id, @Valid @RequestBody AppointmentRequestDTO dto) throws BadRequestException {
 
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
 
-        appointment.setDateAndTime(dto.dateAndTime());
+        if (dto.startTime().isAfter(dto.endTime())) {
+            throw new BadRequestException("Start time cannot be after end time");
+        }
+
+        appointment.setDate(dto.date());
+        appointment.setStartTime(dto.startTime());
+        appointment.setEndTime(dto.endTime());
         appointment.setDescription(dto.description());
         appointment.setStatus(dto.status());
 
         Appointment response = appointmentRepository.save(appointment);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new AppointmentResponseDTO(response));
+    }
+
+    @Transactional
+    @GetMapping("/my-schedule")
+    public ResponseEntity<List<AppointmentResponseDTO>> getSchedule(@AuthenticationPrincipal Jwt jwt) {
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        List<AppointmentResponseDTO> schedule = appointmentRepository.
+                findAllByUserUserId(userId)
+                .stream()
+                .map(AppointmentResponseDTO::new)
+                .toList();
+
+        if (schedule.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok(schedule);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/{id}")
+    public ResponseEntity<AppointmentResponseDTO> getAppointment(@PathVariable UUID id) {
+
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
+
+        return ResponseEntity.ok(new AppointmentResponseDTO(appointment));
     }
 
 }

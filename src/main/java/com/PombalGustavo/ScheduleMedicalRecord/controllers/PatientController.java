@@ -32,9 +32,12 @@ public class PatientController {
     public ResponseEntity<PatientResponseDTO> savePatient(@Valid @RequestBody PatientRequestDTO dto,
                                                           @AuthenticationPrincipal Jwt jwt) {
         UUID clinicId = UUID.fromString(jwt.getClaim("clinicId"));
-
         Clinic clinic = clinicRepository.findById(clinicId)
                 .orElseThrow(() -> new EntityNotFoundException("Clinic not found"));
+
+        if (patientRepository.existsByCpfAndClinicId(dto.cpf(), clinicId)) {
+            throw new RuntimeException("CPF já cadastrado nessa clínica");
+        }
 
         Patient patient = new Patient();
         patient.setName(dto.name());
@@ -89,5 +92,39 @@ public class PatientController {
                 .toList();
 
         return ResponseEntity.ok(dtos);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/{id}")
+    public ResponseEntity<PatientResponseDTO> getPatient(@PathVariable UUID id) {
+
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+
+        return ResponseEntity.ok(new PatientResponseDTO(patient));
+    }
+
+    @GetMapping("/search/name")
+    public ResponseEntity<List<PatientResponseDTO>> searchByName(@RequestParam String name,
+                                                                 @AuthenticationPrincipal Jwt jwt) {
+        UUID clinicId = UUID.fromString(jwt.getClaim("clinicId"));
+
+        List<PatientResponseDTO> patients = patientRepository
+                .findByNameContainingIgnoreCaseAndClinicId(name, clinicId)
+                .stream()
+                .map(PatientResponseDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(patients);
+    }
+
+    @GetMapping("/search/cpf")
+    public ResponseEntity<PatientResponseDTO> searchByCpf(@RequestParam String cpf,
+                                         @AuthenticationPrincipal Jwt jwt) {
+        UUID clinicId = UUID.fromString(jwt.getClaim("clinicId"));
+        Patient patient = patientRepository.findByCpfAndClinicId(cpf, clinicId);
+
+        return ResponseEntity.ok(new PatientResponseDTO(patient));
+
     }
 }

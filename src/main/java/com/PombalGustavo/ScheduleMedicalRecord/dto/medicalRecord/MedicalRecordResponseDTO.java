@@ -2,13 +2,14 @@ package com.PombalGustavo.ScheduleMedicalRecord.dto.medicalRecord;
 
 import com.PombalGustavo.ScheduleMedicalRecord.models.MedicalRecord;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record MedicalRecordResponseDTO(
         UUID medicalRecordId,
         String contentText,
-        Instant createdAt,
+        LocalDateTime createdAt,
         LocalDateTime updatedAt,
         UUID patientId,
         String patientName,

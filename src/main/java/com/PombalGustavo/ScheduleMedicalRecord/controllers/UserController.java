@@ -47,7 +47,7 @@ public class UserController {
 
         var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
-        return ResponseEntity.ok(new LoginResponseDTO(jwtValue, expiresIn));
+        return ResponseEntity.ok(new LoginResponseDTO(jwtValue, expiresIn, user.get().getUsername(), user.get().getClinic().getClinicName()));
     }
 
 }

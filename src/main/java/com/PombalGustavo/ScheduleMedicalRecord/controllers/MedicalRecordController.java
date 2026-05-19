@@ -46,7 +46,7 @@ public class MedicalRecordController {
         medicalRecord.setRawContentText(dto.contentText());
         medicalRecord.setPatient(patientRepository.findById(dto.patientId()).orElseThrow(() -> new EntityNotFoundException("Patient not found")));
         medicalRecord.setAppointment(appointmentRepository.findById(dto.appointmentId()).orElseThrow(() -> new EntityNotFoundException("Appointment not found")));
-        medicalRecord.setCreatedAt(Instant.now());
+        medicalRecord.setCreatedAt(LocalDateTime.now());
         medicalRecord.setUpdatedAt(LocalDateTime.now());
         medicalRecord.setClinic(clinic);
         medicalRecord.setUser(user);

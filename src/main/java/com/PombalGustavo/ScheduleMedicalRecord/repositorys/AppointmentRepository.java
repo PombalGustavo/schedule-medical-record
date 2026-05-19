@@ -11,5 +11,6 @@ import java.util.UUID;
 public interface AppointmentRepository extends JpaRepository<Appointment, UUID> {
 
     List<Appointment> findAllByPatientPatientIdAndClinicId(UUID patientId, UUID clinicId);
+    List<Appointment> findAllByUserUserId(UUID userId);
 
 }
